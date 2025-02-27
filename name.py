@@ -1,1 +1,0 @@
-print("david es puto")
