@@ -11,20 +11,31 @@
 
 5.) Convierta una palabra a Pig Latin. = def pigLatin()
 """
-# Lo voy a separar por medio de funciones
+# Lo voy a separar por medio de funciones los diferentes ejercicios
 
-# EJERCICIO 1.)
+# EJERCICIO 1
 
 def baseN():
-    print(f"\n{"-"*20} Ejercicio 1 {"-"*20}")
+    # Imprimo el texto con un color para sobre salir
+    print(f"\n\033[91m{"-"*20} Ejercicio 1 {"-"*20}\033[0m")
     
+    # En este apartado declaro las variables
     b, n, base = 0, 0, ""
+    # Deben de cumplir con los parametros o si no no salen para la base
     while (2 > b) or (b > 10): 
-        print("\nREGLAS:\n1.)Rango admitido: (2 <= b < 10)\n2.)Tipo de dato: Entero\n")
+        print("""\033[92m
+        REGLAS:
+        
+        1.)Rango admitido: (2 <= b < 10)
+        2.)Tipo de dato: Entero
+        
+        \033[0m""")
         b = int(input("Ingresa la base del numero que quieres hacer = "))
         
+    # Ahora pido el numero para transformarlo a esa base
     n = int(input(f"\nNumero n a pasar a base {b} = "))
     
+    # De esta manera logro sacar el numero con la base correspondiente
     while n != 0:
         residuo = n % b
         n = n // b
@@ -32,22 +43,36 @@ def baseN():
 
     return f"\n El numero {n} en base {b} es: {base}"
 
+# Aqui imprimo los datos
 dato = baseN()
 print(dato)
+
+
 
 # EJERCICIO 2.)
 
 def writeList():
-    print(f"\n{"-"*20} Ejercicio 2 {"-"*20}")
+    print(f"\n\033[91m{"-"*20} Ejercicio 2 {"-"*20}\033[0m")
     
+    # Los numeros los voy a guardar en una lista
     n, lista = 0, []
+    # El numero q debe de ingresar debe de ser mayor a 2
     while n < 2:
-        print("\nREGLAS:\n1.) N debe de ser mayor a 2\n2.) Se va a ser una lista hasta n cuando sean divisibles por 2,3 o 5\n")
+        print("""\033[92m
+              
+        REGLAS:
+        
+        1.) N debe de ser mayor a 2
+        2.) Se va a ser una lista hasta n cuando sean divisibles por 2,3 o 5
+        
+        \033[0m""")
         
         n = int(input("Ingerese n para hacer la lista correspondiente = ")) 
         
+    # Solo agrego aquellos que sean divisibles con 2, 3 y 5, por medio de una funcion any, la cual verica que se cumpla al menos una condicion con los diferentes numeros divisible
     for x in range(1, n + 1):
         if any(x % n == 0 for n in [2, 3, 5]):
+            # En dado caso que sean divisible se agrega a la lista
             lista.append(x)
     
     return lista
@@ -59,14 +84,23 @@ print(dato)
 # Ejercicio 3.)
 
 def separacion():
-    print(f"\n{"-"*20} Ejercicio 3 {"-"*20}")
+    print(f"\n\033[91m{"-"*20} Ejercicio 3 {"-"*20}\033[0m")
     
     frase, palabra = "", ""
     
+    # Me verifica que no sea una sola palabra si no que una frase con el espacio
     while not(" " in frase):
-        print("\nREGLAS:\n1.) Debe de ser una frase\n2.) Debe de ser un string\n")
+        print("""\033[92m
+              
+        REGLAS:
+        
+        1.) Debe de ser una frase
+        2.) Debe de ser un string
+        
+        \033[0m""")
         frase = str(input("Ingrese la frase para poder separarla = "))
         
+    # Hago el proceso debido
     for letra in frase:
         if letra == " ":
             print(palabra)
@@ -81,9 +115,9 @@ separacion()
 # Ejercicio 4.)
 
 def menu():
-    print(f"\n{"-"*20} Ejercicio 4 {"-"*20}")
+    print(f"\n\033[91m{"-"*20} Ejercicio 4 {"-"*20}\033[0m")
     
-    menu = ("""
+    menu = ("""\033[92m
               
     REGLAS DEL MENU:
               
@@ -92,7 +126,7 @@ def menu():
     3.) Las opciones son: | + | - | * | / |
     4.) Si quieres otra vez las reglas escribe: menu
               
-              """)
+    \033[0m""")
     
     string = ""
     print(menu)
@@ -107,6 +141,7 @@ def menu():
                 
             elif string in ["+", "-", "*", "/"]:
                 a, b = "", ""
+                # el isinstance verifica que el primer parametro pertenezca a uno de los tipos que le estoy pidiendo, de tal manera verifico que sean numeros
                 while not (isinstance(a, (int, float)) and isinstance(b, (int, float))):
                     print("Debe de ser un número entero o float ambos.")
             
@@ -136,3 +171,32 @@ def menu():
             print("Ingrese una de las opciones validas")
             
 menu()
+
+# Ejercicio 5.)
+
+def pigLatin():
+    print(f"\n\033[91m{"-"*20} Ejercicio 5 {"-"*20}\033[0m")
+    print("""\033[92m
+      
+    REGLAS:
+    
+    1.) Este es el juego Pit Latin
+    2.) Debes de ingresar una palabra, no un numero o frase
+    3.) La palabra debe de ser de mas de 1 caracter    
+    \033[0m""")
+    
+    salir = True
+    
+    # Verifico que sea una palabra de mas de 2 caracteres
+    while salir:
+        print("\n\033[93mADVERTENCIA = Debe de ser una palabra y en formato de string sin numeros\033[0m")
+        palabra = input("Ingresa porfavor una palabra = ")
+        if palabra.isalpha() and " " not in palabra and len(palabra) >= 2 :
+            salir = False
+    palabra = palabra.lower()
+    
+    return f'\nLa palabra quedaria como = {palabra[1:]}{palabra[0]}ay'
+    
+date = pigLatin()
+print(date)
+            
