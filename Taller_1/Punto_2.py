@@ -26,7 +26,5 @@ for i in range(n, 0, -1):
         numero_primo = i
         break
     
-    if i == 1:
-        numero_primo = n
 
 print(f"El mayor numero primo mas cercano es: {numero_primo}")
