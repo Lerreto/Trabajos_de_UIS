@@ -63,4 +63,3 @@ for i in range(1, n + 1):
         message += f". Divisible por {' y '.join(divisors)}"
         
     print(message)
-
