@@ -5,9 +5,6 @@ número primo de valor más cercano, en este caso menor o igual, al número leí
 
 """
 
-from xml.sax.handler import ContentHandler
-
-
 while True:
     n = int(input("Ingrese un numero entero: "))
 

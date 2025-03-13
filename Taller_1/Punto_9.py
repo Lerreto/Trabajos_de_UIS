@@ -10,11 +10,15 @@ number = int(input("Ingrese un valor entero maximo para la secuencia de finobacc
 n0, n1 = 0, 1
 
 while True:
+    
+
 
     print(n0, end=' ')
     fib = n0 + n1
-    n0 = n1
-    n1 = fib
     
     if n0 > number:
         break
+    
+    n0 = n1
+    n1 = fib
+    
