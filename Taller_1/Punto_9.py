@@ -11,14 +11,13 @@ n0, n1 = 0, 1
 
 while True:
     
-
-
     print(n0, end=' ')
     fib = n0 + n1
-    
-    if n0 > number:
-        break
-    
     n0 = n1
     n1 = fib
+    
+    if n0 > number:
+        print(f"\nEl anterior numero de {number} en finobacci es: {n1 - n0}")
+        break
+    
     
