@@ -1,6 +1,5 @@
 import random as ran
 import matplotlib.pyplot as plt
-import numpy as np
 
 n = 10
 puntos = []
