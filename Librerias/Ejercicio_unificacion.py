@@ -10,10 +10,20 @@ mensaje_bienvenida = ("""
     REGLAS:
     
     1.) Va a ser basada en 3 metodos, bubble, insertion, selection
-    2.) Graficar cuanto duran los metodos en orden en base a la lista (1)
-    3.) Graficar el numero de operaciones y intercambios (2)
-    4.) Reglas basicas o este mensaje (3)
-    4.) Salir (Cualquier cosa)
+    2.) Crear una lista para graficar (1)
+    3.) Reglas basicas o este mensaje (2)
+    4.) Salir (0)
+          
+          """)
+
+mensaje_graficar = ("""
+          
+    ACCIONES:
+    
+    1.) Graficar en funcion de cuanto tiempo demoro (1)
+    2.) Graficar en funcion de las operaciones (2)
+    3.) Reglas basicas o este mensaje (3)
+    4.) Salir (0)
           
           """)
 
@@ -65,8 +75,7 @@ def selection_sort(L:list):
 
     return operaciones
 
-def operaciones_tiemnpo(Metodo, lista_ran, i):
-    
+def operaciones_tiemnpo(Metodo, lista_ran, i, t_metodo, ops_metodo):
 
     vector_ord = lista_ran.copy()
     t_inicio = perf_counter_ns()
@@ -75,7 +84,7 @@ def operaciones_tiemnpo(Metodo, lista_ran, i):
     ops_metodo[i] = datico
     t_metodo[i] = t_final - t_inicio
     
-    return ops_metodo, t_metodo
+    return t_metodo, ops_metodo
     
 
 def contador_segundos():
@@ -86,54 +95,67 @@ def contador_segundos():
     ops_selection = np.zeros(size)
     t_selection = np.zeros(size)
     ops_insertion = np.zeros(size)
+
     
     for i, n in enumerate(num_elements) :
         vector = np.random.randint(0, 100, n, dtype=np.int16)
         
-        t_bubble, ops_bubble = operaciones_tiemnpo(bubble_sort, vector, i)
-        t_selection, ops_selection = operaciones_tiemnpo(selection_sort, vector, i)
-        t_insertion, ops_insertion = operaciones_tiemnpo(insertion_sort, vector, i)
+        t_bubble, ops_bubble = operaciones_tiemnpo(bubble_sort, vector, i, t_bubble, ops_bubble)
+        t_selection, ops_selection = operaciones_tiemnpo(selection_sort, vector, i, t_selection, ops_selection)
+        t_insertion, ops_insertion = operaciones_tiemnpo(insertion_sort, vector, i, t_insertion, ops_insertion)
 
         
     return t_bubble, t_insertion, t_selection, ops_bubble, ops_insertion, ops_selection
 
 
-def grafica_segundos(condicion):
-    bubble, selection, insertion, ops_bubble, ops_insertion, ops_selection = contador_segundos()
+def grafica_segundos():
+    bubble, selection, insertion, op_bubble, op_insertion, op_selection = contador_segundos()
 
-    if condicion == 1:
-        # Graficar los resultados
-        plt.plot(num_elements, bubble, "g-", label="Bubble Sort")
-        plt.plot(num_elements, selection, "r-", label="Selection Sort")
-        plt.plot(num_elements, insertion, "b-", label="Insertion Sort")
-
-        # Añadir título y etiquetas a los ejes
-        plt.title('Comparación de Tiempos de Ejecución de Algoritmos de Ordenamiento')
-        plt.xlabel('Número de elementos')
-        plt.ylabel('Tiempo de ejecución (ns)')
-
-        # Añadir leyenda
-        plt.legend()
-
-        # Mostrar el gráfico
-        plt.show()
+    print(mensaje_graficar)
+    
+    while True:
         
-    elif condicion == 2:
-        # Graficar los resultados
-        plt.plot(num_elements, ops_bubble, "g-", label="Bubble Sort")
-        plt.plot(num_elements, ops_selection, "r-", label="Selection Sort")
-        plt.plot(num_elements, ops_insertion, "b-", label="Insertion Sort")
+        condicion = int(input("Ahora necesito que ingreses que accion hacer (0 para salir) = "))
+        
+        if condicion == 1:
+            # Graficar los resultados
+            plt.plot(num_elements, bubble, "g-", label="Bubble Sort")
+            plt.plot(num_elements, selection, "r-", label="Selection Sort")
+            plt.plot(num_elements, insertion, "b-", label="Insertion Sort")
 
-        # Añadir título y etiquetas a los ejes
-        plt.title('Comparación de Operaciones en Ejecución de Algoritmos de Ordenamiento')
-        plt.xlabel('Operaciones')
-        plt.ylabel('Operaciones')
+            # Añadir título y etiquetas a los ejes
+            plt.title('Comparación de Tiempos de Ejecución de Algoritmos de Ordenamiento')
+            plt.xlabel('Número de elementos')
+            plt.ylabel('Tiempo de ejecución (ns)')
 
-        # Añadir leyenda
-        plt.legend()
+            # Añadir leyenda
+            plt.legend()
 
-        # Mostrar el gráfico
-        plt.show()
+            # Mostrar el gráfico
+            plt.show()
+            
+        elif condicion == 2:
+            # Graficar los resultados
+            plt.plot(num_elements, op_bubble, "g-", label="Bubble Sort")
+            plt.plot(num_elements, op_insertion, "r-", label="Selection Sort")
+            plt.plot(num_elements, op_selection, "b-", label="Insertion Sort")
+
+            # Añadir título y etiquetas a los ejes
+            plt.title('Comparación de Operaciones en Ejecución de Algoritmos de Ordenamiento')
+            plt.xlabel('Operaciones')
+            plt.ylabel('Operaciones')
+
+            # Añadir leyenda
+            plt.legend()
+
+            # Mostrar el gráfico
+            plt.show()
+            
+        elif condicion == 3:
+            print(mensaje_graficar)
+            
+        else:
+            break
 
 
 # Estructura basica para inicializacion de graficas
@@ -155,12 +177,9 @@ while True:
     number = int(input("Ingrese la accion que desea realizar = "))
     
     if number == 1:
-        grafica_segundos(1)
-        
-    elif number == 2:
-        grafica_segundos(2)
+        grafica_segundos()
     
-    elif number == 3:
+    elif number == 2:
         print(mensaje_bienvenida)
         
     else:
