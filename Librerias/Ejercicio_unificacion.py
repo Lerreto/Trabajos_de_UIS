@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from time import perf_counter_ns
 import random as rnd
 
+#? Mensajes personalizados para hacer el menu mas accesible
 mensaje_bienvenida = ("""
           
     BIENVENIDOS AL MENU DE GRAFICACION
@@ -27,7 +28,8 @@ mensaje_graficar = ("""
           
           """)
 
-# Bubble sort
+#? Aqui estan los metodos de ordenamiento para poder hacer luego las graficas
+#! Bubble sort
 def bubble_sort(L:list):
     
     operaciones = 0
@@ -42,7 +44,7 @@ def bubble_sort(L:list):
 
     return operaciones
 
-# Insertion sort
+#! Insertion sort
 def insertion_sort(L:list):
     
     operaciones = 0
@@ -58,7 +60,7 @@ def insertion_sort(L:list):
 
     return operaciones
 
-# Selection sort
+#! Selection sort
 def selection_sort(L:list):
     
     operaciones = 0
@@ -75,6 +77,7 @@ def selection_sort(L:list):
 
     return operaciones
 
+#? Operador de tiempo para evitar tanto codigo repetido
 def operaciones_tiemnpo(Metodo, lista_ran, i, t_metodo, ops_metodo):
 
     vector_ord = lista_ran.copy()
@@ -158,21 +161,12 @@ def grafica_segundos():
             break
 
 
-# Estructura basica para inicializacion de graficas
+#? Estructura basica para inicializacion de graficas, que no es necesario ejecutarlo mas de 1 vez
 num_elements = np.arange(10, 101, 10)
-#print(num_elements)
 size = num_elements.size
-#print(size)
-#print(num_elements)
-t_bubble = np.zeros(size)
-t_selection = np.zeros(size)
-t_insertion = np.zeros(size)
-ops_bubble = np.zeros(size)
-ops_selection = np.zeros(size)
-ops_insertion = np.zeros(size)
 
+#? Aqui simplemente se ejecuta todo que es una simple funcion
 print(mensaje_bienvenida)
-
 while True:
     number = int(input("Ingrese la accion que desea realizar = "))
     
