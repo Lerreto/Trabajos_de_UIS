@@ -1,3 +1,21 @@
+"""
+
+2. Construir un programa que tome una cadena de caracteres e imprima todas la posibles permutaciones de los mismos. Antes de construirlas, el programa deberá limpiar posibles caracteres repetidos de la cadena. Se deberá obtener un número N de elementos que se toman, y se debe tener en cuenta el número M de posibles valores, es decir, el número de caracteres diferentes en la cadena dada. Por ejemplo:
+
+cadena de entrada: abcfga
+elementos que se tienen en cuenta: abcfg
+permutaciones:
+abcfg
+abcgf
+abgfc
+…
+
+El programa deberá imprimir todas las posibles permutaciones, que se entienden como todos los posibles ordenamientos del conjunto de caracteres que resulta de la limpieza de la cadena dada. Cada permutación se debe convertir en una cadena de texto a la hora de presentar los resultados.
+
+"""
+
+
+
 def limpiar_cadena(palabra):
     cadena_devolver = []
     for x in palabra:
