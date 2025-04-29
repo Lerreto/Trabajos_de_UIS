@@ -1,6 +1,6 @@
 def encontrar_pares(lista, objetivo):
-    vistos = set()  # Conjunto para almacenar los números ya vistos
-    pares = set()   # Conjunto para almacenar los pares únicos encontrados
+    vistos = set()
+    pares = set()
     
     for num in lista:
         complemento = objetivo - num

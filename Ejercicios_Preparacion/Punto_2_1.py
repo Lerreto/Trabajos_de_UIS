@@ -14,8 +14,6 @@ El programa deberá imprimir todas las posibles permutaciones, que se entienden 
 
 """
 
-
-
 def limpiar_cadena(palabra):
     cadena_devolver = []
     for x in palabra:
