@@ -22,9 +22,12 @@ def Extendermatriz(A:list):
 def ReduccionGaussJordan(A):
     filas, cols = A.shape
     # proceso para fijar la fila de referencia y hallar el factor que anula el elemento correspondiente en la fila que se quiere reducir
+    print(filas)
+    print(cols)
     for i in range(filas):
         # i representa la fila que está siendo fijada
         for j in range(filas):
+            print(i, j)
             # j representa la fila a comparar
             if i != j :
                 print(f"Fila fija = {i}")
