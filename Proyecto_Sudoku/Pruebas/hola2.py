@@ -49,12 +49,7 @@ def númerosolo(A, B, C):
             convun.append(conum[0])
     
     return convun
-            
-        
-        
-        
-        
-        
+                 
 
 while True:
 
