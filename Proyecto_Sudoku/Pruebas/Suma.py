@@ -382,6 +382,9 @@ def main():
     else:
         print("No se pudo resolver el sudoku")
         solver.print_candidates()
+        
+    SUDOKU_RESUELTO = solver.grid.copy()
+    print(SUDOKU_RESUELTO)
 
 if __name__ == "__main__":
     main()

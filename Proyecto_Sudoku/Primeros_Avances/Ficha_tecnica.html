@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación Técnica - Solucionador Avanzado de Sudoku</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #7f8c8d;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 -2px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h4 {
+            color: #34495e;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .method-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .method-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-name {
+            font-weight: bold;
+            color: #2980b9;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        
+        .method-params {
+            background: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 8px 0;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+        
+        .flow-diagram {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flow-step {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s ease;
+        }
+        
+        .flow-step:hover {
+            transform: scale(1.05);
+        }
+        
+        .arrow {
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+        
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+        
+        .complexity-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .complexity-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .complexity-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #0c5460;
+        }
+        
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible:hover {
+            color: #667eea;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.active {
+            max-height: 1000px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧩 Solucionador Avanzado de Sudoku</h1>
+            <p>Documentación Técnica Completa del Sistema de Resolución Inteligente</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">📋 Resumen</button>
+            <button class="nav-tab" onclick="showTab('architecture')">🏗️ Arquitectura</button>
+            <button class="nav-tab" onclick="showTab('methods')">⚙️ Métodos</button>
+            <button class="nav-tab" onclick="showTab('algorithms')">🧠 Algoritmos</button>
+            <button class="nav-tab" onclick="showTab('flow')">🔄 Flujo</button>
+            <button class="nav-tab" onclick="showTab('usage')">💻 Uso</button>
+        </div>
+        
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h3><span class="icon">📖</span>Descripción General</h3>
+                <p>El <span class="highlight">AdvancedSudokuSolver</span> es un sistema inteligente de resolución de Sudoku que combina múltiples técnicas lógicas avanzadas con backtracking optimizado. Implementa estrategias usadas por solucionadores humanos expertos antes de recurrir a fuerza bruta.</p>
+                
+                <div class="info">
+                    <strong>🎯 Objetivo Principal:</strong> Resolver puzzles de Sudoku utilizando primero lógica pura (como lo haría un humano experto) y solo recurrir a backtracking cuando sea absolutamente necesario.
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">✨</span>Características Principales</h3>
+                <div class="method-card">
+                    <div class="method-name">🔍 Técnicas Lógicas Avanzadas</div>
+                    <p>Implementa 4 técnicas principales: Naked Singles, Hidden Singles, Naked Pairs y Pointing Pairs</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">🧠 Backtracking Inteligente</div>
+                    <p>Utiliza la heurística MRV (Minimum Remaining Values) para optimizar la búsqueda</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">📊 Sistema de Candidatos</div>
+                    <p>Mantiene y actualiza dinámicamente los números posibles para cada celda vacía</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">🎮 Interfaz de Depuración</div>
+                    <p>Proporciona información detallada del proceso de resolución paso a paso</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">⚡</span>Complejidad y Rendimiento</h3>
+                <table class="complexity-table">
+                    <tr>
+                        <th>Aspecto</th>
+                        <th>Complejidad</th>
+                        <th>Descripción</th>
+                    </tr>
+                    <tr>
+                        <td>Técnicas Lógicas</td>
+                        <td>O(n²) por iteración</td>
+                        <td>Muy eficiente para la mayoría de puzzles</td>
+                    </tr>
+                    <tr>
+                        <td>Backtracking</td>
+                        <td>O(9^(celdas_vacías))</td>
+                        <td>Optimizado con MRV y poda temprana</td>
+                    </tr>
+                    <tr>
+                        <td>Memoria</td>
+                        <td>O(n²)</td>
+                        <td>Almacena grid + candidatos</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div id="architecture" class="tab-content">
+            <div class="section">
+                <h3><span class="icon">🏗️</span>Estructura de la Clase</h3>
+                
+                <h4>Propiedades Principales</h4>
+                <div class="method-card">
+                    <div class="method-name">self.size = 9</div>
+                    <p>Tamaño del grid de Sudoku (9x9)</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">self.box_size = 3</div>
+                    <p>Tamaño de cada caja/subcuadrícula (3x3)</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">self.grid</div>
+                    <p>Matriz NumPy 9x9 que representa el estado actual del Sudoku</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">self.candidates</div>
+                    <p>Diccionario que mapea posiciones (row, col) a sets de números posibles</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">🔧</span>Métodos de Utilidad</h3>
+                
+                <div class="method-card">
+                    <div class="method-name">get_candidates(row, col)</div>
+                    <div class="method-params">Parámetros: int row, int col → set</div>
+                    <p>Calcula y retorna el conjunto de números válidos para una celda específica basándose en las reglas del Sudoku.</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">update_all_candidates()</div>
+                    <div class="method-params">Parámetros: None → None</div>
+                    <p>Recalcula completamente la matriz de candidatos para todas las celdas vacías del grid.</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">update_candidates_after_placement(row, col, num)</div>
+                    <div class="method-params">Parámetros: int row, int col, int num → None</div>
+                    <p>Actualiza eficientemente los candidatos después de colocar un número, eliminándolo de fila, columna y caja correspondientes.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="methods" class="tab-content">
+            <div class="section">
+                <h3><span class="icon">🎯</span>Métodos de Resolución Principales</h3>
+                
+                <div class="method-card">
+                    <div class="method-name">solve(grid)</div>
+                    <div class="method-params">Parámetros: numpy.array grid → bool</div>
+                    <p><strong>Método Principal:</strong> Coordina todo el proceso de resolución. Primero aplica técnicas lógicas y luego backtracking si es necesario.</p>
+                    <div class="code-block">
+def solve(self, grid):
+    self.grid = grid.copy()
+    # 1. Intentar resolver con lógica pura
+    if self.solve_with_logic():
+        return True
+    # 2. Si queda algo, usar backtracking
+    return self.solve_with_backtrack()
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">solve_with_logic()</div>
+                    <div class="method-params">Parámetros: None → bool</div>
+                    <p>Aplica iterativamente todas las técnicas lógicas hasta que no se pueda hacer más progreso.</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">solve_with_backtrack()</div>
+                    <div class="method-params">Parámetros: None → bool</div>
+                    <p>Sistema de backtracking optimizado que usa la heurística MRV para seleccionar la próxima celda a llenar.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">🖨️</span>Métodos de Visualización</h3>
+                
+                <div class="method-card">
+                    <div class="method-name">print_grid(grid=None)</div>
+                    <div class="method-params">Parámetros: numpy.array grid (opcional) → None</div>
+                    <p>Imprime el Sudoku en formato legible con separadores para las cajas 3x3.</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">print_candidates()</div>
+                    <div class="method-params">Parámetros: None → None</div>
+                    <p>Muestra todos los candidatos restantes para depuración, útil para entender el estado interno.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="algorithms" class="tab-content">
+            <div class="section">
+                <h3><span class="icon">🧠</span>Técnicas Lógicas Implementadas</h3>
+                
+                <div class="method-card">
+                    <div class="method-name">1. Naked Singles (Números Desnudos)</div>
+                    <p><strong>Concepto:</strong> Si una celda solo tiene un candidato posible, ese debe ser el número correcto.</p>
+                    <div class="info">
+                        <strong>Implementación:</strong> Recorre todas las celdas con candidatos y llena aquellas que solo tienen una opción.
+                    </div>
+                    <div class="code-block">
+# Ejemplo: Si una celda solo puede ser 7
+if len(candidates) == 1:
+    place_number(position, candidates[0])
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">2. Hidden Singles (Números Ocultos)</div>
+                    <p><strong>Concepto:</strong> Si un número solo puede ir en una posición dentro de una fila, columna o caja, debe ir ahí.</p>
+                    <div class="info">
+                        <strong>Implementación:</strong> Para cada número (1-9), verifica si solo hay una posición válida en cada región.
+                    </div>
+                    <div class="code-block">
+# Ejemplo: Si el 5 solo puede ir en una celda de la fila
+for number in range(1, 10):
+    possible_positions = find_positions_in_row(number)
+    if len(possible_positions) == 1:
+        place_number(possible_positions[0], number)
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">3. Naked Pairs (Parejas Desnudas)</div>
+                    <p><strong>Concepto:</strong> Si dos celdas en la misma región solo pueden contener los mismos dos números, esos números no pueden aparecer en otras celdas de esa región.</p>
+                    <div class="warning">
+                        <strong>Complejidad:</strong> Esta técnica requiere comparar múltiples celdas y puede ser computacionalmente más costosa.
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">4. Pointing Pairs (Parejas Apuntadas)</div>
+                    <p><strong>Concepto:</strong> Si un candidato en una caja solo aparece en una fila o columna, puede eliminarse de esa fila/columna fuera de la caja.</p>
+                    <div class="info">
+                        <strong>Aplicación:</strong> Muy efectiva para reducir candidatos en puzzles complejos.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">🔍</span>Algoritmo de Backtracking</h3>
+                
+                <div class="method-card">
+                    <div class="method-name">Heurística MRV (Minimum Remaining Values)</div>
+                    <p>Selecciona la celda con menor número de candidatos posibles para intentar llenar primero.</p>
+                    <div class="code-block">
+# Encuentra la celda con menos opciones
+min_candidates = min(len(cands) for cands in candidates.values())
+target_cell = find_cell_with_candidates(min_candidates)
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Propagación de Restricciones</div>
+                    <p>Después de cada colocación, actualiza inmediatamente todos los candidatos afectados para detectar inconsistencias temprano.</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Poda Temprana</div>
+                    <p>Si cualquier celda queda sin candidatos válidos, inmediatamente hace backtrack sin explorar más.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="flow" class="tab-content">
+            <div class="section">
+                <h3><span class="icon">🔄</span>Flujo de Ejecución</h3>
+                
+                <div class="flow-diagram">
+                    <div class="flow-step">Inicialización</div>
+                    <span class="arrow">→</span>
+                    <div class="flow-step">Cálculo de Candidatos</div>
+                    <span class="arrow">→</span>
+                    <div class="flow-step">Técnicas Lógicas</div>
+                    <br><br>
+                    <span class="arrow">↓</span>
+                    <br>
+                    <div class="flow-step">¿Resuelto?</div>
+                    <span class="arrow">→</span>
+                    <div class="flow-step">Backtracking MRV</div>
+                    <span class="arrow">→</span>
+                    <div class="flow-step">Solución</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3 class="collapsible" onclick="toggleCollapsible(this)"><span class="icon">📝</span>Algoritmo Detallado ▼</h3>
+                <div class="collapsible-content">
+                    <div class="code-block">
+1. INICIALIZACIÓN
+   - Copiar grid de entrada
+   - Calcular candidatos iniciales para todas las celdas vacías
+
+2. FASE LÓGICA (iterativa hasta no haber progreso)
+   a. Aplicar Naked Singles
+   b. Aplicar Hidden Singles  
+   c. Aplicar Naked Pairs
+   d. Aplicar Pointing Pairs
+   e. Limpiar candidatos vacíos
+   f. ¿Hay progreso? → continuar, sino → fase 3
+
+3. VERIFICACIÓN
+   - ¿Grid completo? → ÉXITO
+   - ¿Candidatos restantes? → fase 4
+
+4. FASE BACKTRACKING
+   a. Seleccionar celda con menos candidatos (MRV)
+   b. Para cada candidato posible:
+      - Guardar estado actual
+      - Colocar número y actualizar candidatos
+      - ¿Estado válido? → recursión
+      - ¿Éxito? → ÉXITO
+      - Sino → restaurar estado y probar siguiente
+   c. ¿Todos los candidatos fallaron? → FALLO
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">⏱️</span>Orden de Aplicación de Técnicas</h3>
+                <p>Las técnicas se aplican en orden de <span class="highlight">eficiencia computacional</span> y <span class="highlight">efectividad</span>:</p>
+                
+                <table class="complexity-table">
+                    <tr>
+                        <th>Orden</th>
+                        <th>Técnica</th>
+                        <th>Complejidad</th>
+                        <th>Efectividad</th>
+                    </tr>
+                    <tr>
+                        <td>1°</td>
+                        <td>Naked Singles</td>
+                        <td>O(n²)</td>
+                        <td>Alta - Rápida</td>
+                    </tr>
+                    <tr>
+                        <td>2°</td>
+                        <td>Hidden Singles</td>
+                        <td>O(n³)</td>
+                        <td>Alta - Fundamental</td>
+                    </tr>
+                    <tr>
+                        <td>3°</td>
+                        <td>Naked Pairs</td>
+                        <td>O(n⁴)</td>
+                        <td>Media - Específica</td>
+                    </tr>
+                    <tr>
+                        <td>4°</td>
+                        <td>Pointing Pairs</td>
+                        <td>O(n³)</td>
+                        <td>Media - Intersecciones</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div id="usage" class="tab-content">
+            <div class="section">
+                <h3><span class="icon">💻</span>Ejemplo de Uso</h3>
+                
+                <div class="code-block">
+import numpy as np
+
+# Crear una instancia del solucionador
+solver = AdvancedSudokuSolver()
+
+# Definir un puzzle (0 representa celdas vacías)
+puzzle = np.array([
+    [5, 3, 0, 0, 7, 0, 0, 0, 0],
+    [6, 0, 0, 1, 9, 5, 0, 0, 0],
+    [0, 9, 8, 0, 0, 0, 0, 6, 0],
+    [8, 0, 0, 0, 6, 0, 0, 0, 3],
+    [4, 0, 0, 8, 0, 3, 0, 0, 1],
+    [7, 0, 0, 0, 2, 0, 0, 0, 6],
+    [0, 6, 0, 0, 0, 0, 2, 8, 0],
+    [0, 0, 0, 4, 1, 9, 0, 0, 5],
+    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+])
+
+# Resolver el puzzle
+if solver.solve(puzzle):
+    print("¡Puzzle resuelto exitosamente!")
+    solver.print_grid()
+else:
+    print("No se pudo resolver el puzzle")
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">🔧</span>Parámetros de Configuración</h3>
+                
+                <div class="method-card">
+                    <div class="method-name">Modificaciones Posibles</div>
+                    <p>El código está diseñado para ser extensible:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Agregar nuevas técnicas lógicas (Hidden Pairs, X-Wing, etc.)</li>
+                        <li>Modificar el orden de aplicación de técnicas</li>
+                        <li>Ajustar la heurística de backtracking</li>
+                        <li>Agregar métricas de rendimiento</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">📊</span>Salida del Sistema</h3>
+                
+                <div class="info">
+                    El solver proporciona información detallada durante la ejecución:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Progreso por iteración:</strong> Qué técnicas se aplicaron</li>
+                        <li><strong>Número de celdas restantes:</strong> Antes del backtracking</li>
+                        <li><strong>Estado final:</strong> Éxito o fallo en la resolución</li>
+                    </ul>
+                </div>
+                
+                <div class="code-block">
+Resolviendo con técnicas lógicas...
+Iteración 1
+  ✓ Números desnudos aplicados
+  ✓ Números ocultos aplicados
+Iteración 2
+  ✓ Parejas desnudas aplicadas
+Técnicas lógicas completadas en 2 iteraciones
+Quedan 12 celdas por resolver
+Aplicando backtracking inteligente...
+¡Resuelto con backtracking!
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3><span class="icon">⚠️</span>Consideraciones de Rendimiento</h3>
+                
+                <div class="warning">
+                    <strong>Puzzles Muy Difíciles:</strong> En casos extremos donde las técnicas lógicas resuelven pocas celdas, el backtracking puede tomar tiempo exponencial.
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Optimizaciones Implementadas</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Heurística MRV:</strong> Reduce dramáticamente el espacio de búsqueda</li>
+                        <li><strong>Propagación Inmediata:</strong> Detecta inconsistencias temprano</li>
+                        <li><strong>Orden de Técnicas:</strong> Aplica primero las más eficientes</li>
+                        <li><strong>Limpieza de Candidatos:</strong> Elimina sets vacíos para evitar errores</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nueva sección: Análisis Técnico Detallado -->
+        <div class="section" style="margin-top: 40px; border-left: 5px solid #e74c3c;">
+            <h3><span class="icon">🔬</span>Análisis Técnico Profundo</h3>
+            
+            <div class="section">
+                <h4>🏗️ Patrones de Diseño Utilizados</h4>
+                
+                <div class="method-card">
+                    <div class="method-name">Strategy Pattern (Patrón Estrategia)</div>
+                    <p>Cada técnica lógica es una estrategia independiente que puede aplicarse o no según el estado del puzzle.</p>
+                    <div class="code-block">
+# Las técnicas son métodos intercambiables
+techniques = [
+    self.naked_singles,
+    self.hidden_singles, 
+    self.naked_pairs,
+    self.pointing_pairs
+]
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">State Pattern (Patrón Estado)</div>
+                    <p>El solver mantiene y gestiona el estado completo del puzzle (grid + candidatos) y puede restaurarlo durante backtracking.</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Template Method (Método Plantilla)</div>
+                    <p>El método <code>solve()</code> define el algoritmo general, delegando pasos específicos a métodos especializados.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h4>📊 Estructuras de Datos</h4>
+                
+                <table class="complexity-table">
+                    <tr>
+                        <th>Estructura</th>
+                        <th>Tipo</th>
+                        <th>Propósito</th>
+                        <th>Complejidad Acceso</th>
+                    </tr>
+                    <tr>
+                        <td>self.grid</td>
+                        <td>NumPy Array (9x9)</td>
+                        <td>Estado actual del Sudoku</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>self.candidates</td>
+                        <td>Dict[(int,int): Set[int]]</td>
+                        <td>Candidatos por posición</td>
+                        <td>O(1) promedio</td>
+                    </tr>
+                    <tr>
+                        <td>used_numbers</td>
+                        <td>Set[int]</td>
+                        <td>Números usados temporalmente</td>
+                        <td>O(1) promedio</td>
+                    </tr>
+                    <tr>
+                        <td>pairs (en naked_pairs)</td>
+                        <td>DefaultDict[FrozenSet: List]</td>
+                        <td>Agrupación de parejas</td>
+                        <td>O(1) promedio</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="section">
+                <h4>🧮 Análisis de Complejidad Detallado</h4>
+                
+                <div class="method-card">
+                    <div class="method-name">get_candidates(row, col)</div>
+                    <div class="method-params">Complejidad: O(1) - Constante</div>
+                    <p><strong>Análisis:</strong> Accede a arrays de tamaño fijo (9 elementos), no depende del input.</p>
+                    <div class="code-block">
+# Operaciones de complejidad constante:
+- grid[row, :] → O(9) = O(1)  
+- grid[:, col] → O(9) = O(1)
+- grid[box_slice] → O(9) = O(1)
+- set operations → O(9) = O(1)
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">naked_singles()</div>
+                    <div class="method-params">Complejidad: O(n) donde n = celdas_vacías</div>
+                    <p><strong>Análisis:</strong> Itera sobre candidatos una vez, operaciones internas son O(1).</p>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">hidden_singles()</div>
+                    <div class="method-params">Complejidad: O(n²) - Cuadrática</div>
+                    <p><strong>Análisis:</strong> Triple bucle anidado: 9 filas × 9 números × máximo 9 celdas</p>
+                    <div class="code-block">
+for row in range(9):           # 9 iteraciones
+    for num in range(1, 10):   # 9 iteraciones  
+        for col in range(9):   # máximo 9 iteraciones
+            # → 9 × 9 × 9 = 729 = O(1) para Sudoku
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">naked_pairs()</div>
+                    <div class="method-params">Complejidad: O(n³) - Cúbica</div>
+                    <p><strong>Análisis:</strong> La más costosa computacionalmente debido a comparaciones múltiples.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h4>🔍 Optimizaciones Específicas del Código</h4>
+                
+                <div class="method-card">
+                    <div class="method-name">1. Uso de Sets para Candidatos</div>
+                    <p>Los conjuntos (Set) permiten operaciones matemáticas eficientes:</p>
+                    <div class="code-block">
+# Intersección y diferencia en O(1) promedio
+candidates = all_numbers - used_numbers
+candidates.discard(number)  # O(1)
+candidates -= pair_set      # O(min(len(candidates), len(pair_set)))
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">2. Actualización Incremental</div>
+                    <p>En lugar de recalcular todo, actualiza solo lo necesario:</p>
+                    <div class="code-block">
+# Después de colocar un número, solo actualiza celdas afectadas
+def update_candidates_after_placement(self, row, col, num):
+    # Solo elimina de fila, columna y caja - no recalcula todo
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">3. Detección Temprana de Progreso</div>
+                    <p>Cada técnica retorna si hizo cambios, evitando iteraciones innecesarias:</p>
+                    <div class="code-block">
+while True:
+    progress = False
+    progress |= self.naked_singles()
+    progress |= self.hidden_singles()
+    if not progress:
+        break  # Sale inmediatamente si no hay cambios
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">4. Heurística MRV en Backtracking</div>
+                    <p>Selecciona la celda más restrictiva primero:</p>
+                    <div class="code-block">
+# Encuentra celda con menos opciones → mayor probabilidad de éxito/fallo rápido
+min_candidates = min(len(cands) for cands in self.candidates.values())
+# Reduce dramáticamente el factor de ramificación
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h4>⚡ Casos de Rendimiento</h4>
+                
+                <div class="info">
+                    <strong>🚀 Mejor Caso:</strong> Puzzle resuelto completamente con técnicas lógicas
+                    <br><strong>Complejidad:</strong> O(k × n²) donde k = número de iteraciones (típicamente 2-10)
+                </div>
+                
+                <div class="warning">
+                    <strong>🐌 Peor Caso:</strong> Muy pocas celdas resueltas por lógica, backtracking extensivo
+                    <br><strong>Complejidad:</strong> O(9^m) donde m = celdas sin resolver por lógica
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Caso Promedio (Puzzles Típicos)</div>
+                    <p>Las técnicas lógicas resuelven 60-80% de las celdas, dejando 10-15 para backtracking.</p>
+                    <p><strong>Tiempo esperado:</strong> < 1 segundo para la mayoría de puzzles válidos</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h4>🔧 Posibles Mejoras y Extensiones</h4>
+                
+                <div class="method-card">
+                    <div class="method-name">Técnicas Lógicas Adicionales</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Hidden Pairs/Triples:</strong> Generalizaciones de Naked Pairs</li>
+                        <li><strong>X-Wing:</strong> Patrones rectangulares en filas/columnas</li>
+                        <li><strong>Swordfish:</strong> Extensión 3D del X-Wing</li>
+                        <li><strong>XY-Wing:</strong> Cadenas de implicación lógica</li>
+                    </ul>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Optimizaciones de Rendimiento</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Constraint Propagation:</strong> Propagación más agresiva de restricciones</li>
+                        <li><strong>Look-ahead:</strong> Evaluación de consecuencias antes de colocar números</li>
+                        <li><strong>Ordenamiento de Valores:</strong> Probar candidatos en orden de probabilidad</li>
+                        <li><strong>Paralelización:</strong> Explorar múltiples ramas simultáneamente</li>
+                    </ul>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-name">Funcionalidades Adicionales</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Validación de Puzzles:</strong> Verificar si un puzzle tiene solución única</li>
+                        <li><strong>Generación de Puzzles:</strong> Crear nuevos puzzles con dificultad específica</li>
+                        <li><strong>Análisis de Dificultad:</strong> Clasificar puzzles según técnicas requeridas</li>
+                        <li><strong>Modo Paso a Paso:</strong> Mostrar cada técnica aplicada interactivamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer con información adicional -->
+        <div class="section" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-align: center; border-left: none;">
+            <h3><span class="icon">🎯</span>Resumen Ejecutivo</h3>
+            <p>Este solucionador representa una implementación sofisticada que combina la elegancia de las técnicas lógicas humanas con la potencia computacional del backtracking optimizado. Su diseño modular permite extensiones futuras y su rendimiento es excelente para la gran mayoría de puzzles de Sudoku encontrados en la práctica.</p>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <strong>📈 Estadísticas Clave:</strong><br>
+                ✅ 4 Técnicas Lógicas Implementadas<br>
+                ✅ Backtracking con Heurística MRV<br>
+                ✅ Complejidad Optimizada O(k×n²) en caso típico<br>
+                ✅ Interfaz de Depuración Completa
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Ocultar todos los contenidos
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remover clase active de todas las pestañas
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar el contenido seleccionado
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar la pestaña clickeada
+            event.target.classList.add('active');
+        }
+        
+        function toggleCollapsible(element) {
+            const content = element.nextElementSibling;
+            const isActive = content.classList.contains('active');
+            
+            if (isActive) {
+                content.classList.remove('active');
+                element.innerHTML = element.innerHTML.replace('▲', '▼');
+            } else {
+                content.classList.add('active');
+                element.innerHTML = element.innerHTML.replace('▼', '▲');
+            }
+        }
+        
+        // Efectos de hover y animaciones adicionales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Añadir efectos de hover a las tarjetas de métodos
+            const methodCards = document.querySelectorAll('.method-card');
+            methodCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.07)';
+                });
+            });
+            
+            // Efecto de escritura para el código
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                block.addEventListener('mouseenter', function() {
+                    this.style.background = '#34495e';
+                    this.style.transition = 'background 0.3s ease';
+                });
+                
+                block.addEventListener('mouseleave', function() {
+                    this.style.background = '#2c3e50';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
