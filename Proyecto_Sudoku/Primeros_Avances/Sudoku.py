@@ -13,6 +13,7 @@ class AdvancedSudokuSolver:
         if self.grid[row, col] != 0:
             return set()
         
+        # Los candidatos los guarda en un set
         used_numbers = set()
         
         # Números usados en la fila

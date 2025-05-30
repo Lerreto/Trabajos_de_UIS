@@ -35,6 +35,8 @@ class AdvancedSudokuSolver:
             for j in range(9):
                 if self.grid[i, j] == 0:
                     self.candidates[(i, j)] = self.get_candidates(i, j)
+                    
+        print(self.candidates)
     
     def naked_singles(self):
         """Técnica: Números desnudos (celdas con un solo candidato)"""
@@ -382,6 +384,9 @@ def main():
     else:
         print("No se pudo resolver el sudoku")
         solver.print_candidates()
+        
+    print(solver.grid)
+    print(solver.candidates)
 
 if __name__ == "__main__":
     main()
