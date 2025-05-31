@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import messagebox
 import numpy as np
 from collections import defaultdict
 
@@ -15,6 +13,7 @@ class AdvancedSudokuSolver:
         if self.grid[row, col] != 0:
             return set()
         
+        # Los candidatos los guarda en un set
         used_numbers = set()
         
         # Números usados en la fila
@@ -55,33 +54,29 @@ class AdvancedSudokuSolver:
         progress = False
         
         # Verificar filas
-        for row in range(9):
+        for primary_idx in range(9):
             for num in range(1, 10):
                 possible_cols = []
-                for col in range(9):
-                    if (row, col) in self.candidates and num in self.candidates[(row, col)]:
-                        possible_cols.append(col)
+                possible_rows = []
+                for secondary_idx in range(9):
+                    if (primary_idx, secondary_idx) in self.candidates and num in self.candidates[(primary_idx, secondary_idx)]:
+                        possible_cols.append(secondary_idx)
+                    if (secondary_idx, primary_idx) in self.candidates and num in self.candidates[(secondary_idx, primary_idx)]:
+                        possible_rows.append(secondary_idx)
                 
                 if len(possible_cols) == 1:
-                    col = possible_cols[0]
-                    self.grid[row, col] = num
-                    del self.candidates[(row, col)]
-                    self.update_candidates_after_placement(row, col, num)
-                    progress = True
-        
-        # Verificar columnas
-        for col in range(9):
-            for num in range(1, 10):
-                possible_rows = []
-                for row in range(9):
-                    if (row, col) in self.candidates and num in self.candidates[(row, col)]:
-                        possible_rows.append(row)
-                
+                    secondary_idx = possible_cols[0]
+                    self.grid[primary_idx, secondary_idx] = num
+                    del self.candidates[(primary_idx, secondary_idx)]
+                    self.update_candidates_after_placement(primary_idx, secondary_idx, num)
+                    
                 if len(possible_rows) == 1:
-                    row = possible_rows[0]
-                    self.grid[row, col] = num
-                    del self.candidates[(row, col)]
-                    self.update_candidates_after_placement(row, col, num)
+                    secondary_idx = possible_rows[0]
+                    self.grid[primary_idx, secondary_idx] = num
+                    del self.candidates[(secondary_idx, primary_idx)]
+                    self.update_candidates_after_placement(secondary_idx, primary_idx, num)
+                
+                if len(possible_cols) == 1 or len(possible_rows) == 1:
                     progress = True
         
         # Verificar cajas 3x3
@@ -107,35 +102,79 @@ class AdvancedSudokuSolver:
         """Técnica: Parejas desnudas (dos celdas con los mismos dos candidatos)"""
         progress = False
         
-        # Verificar en filas
-        for row in range(9):
-            row_candidates = {col: cands for (r, col), cands in self.candidates.items() 
-                            if r == row and len(cands) == 2}
-            
-            pairs = defaultdict(list)
-            for col, cands in row_candidates.items():
-                pairs[frozenset(cands)].append(col)
-            
-            for cand_set, cols in pairs.items():
-                if len(cols) == 2:  # Pareja encontrada
-                    # Eliminar estos candidatos de otras celdas en la fila
-                    for col in range(9):
-                        if (row, col) in self.candidates and col not in cols:
-                            before_len = len(self.candidates[(row, col)])
-                            self.candidates[(row, col)] -= cand_set
-                            if len(self.candidates[(row, col)]) < before_len:
-                                progress = True
+    # Procesar tanto filas (True) como columnas (False)
+        for is_row in [True, False]:
+            for primary_idx in range(9):
+                # Obtener candidatos de la unidad (fila o columna)
+                unit_candidates = {}
+                for secondary_idx in range(9):
+                    # Determinar coordenadas según si es fila o columna
+                    if is_row:
+                        pos = (primary_idx, secondary_idx)  # (row, col)
+                        key = secondary_idx  # col
+                    else:
+                        pos = (secondary_idx, primary_idx)  # (row, col)
+                        key = secondary_idx  # row
+                    
+                    if pos in self.candidates and len(self.candidates[pos]) == 2:
+                        unit_candidates[key] = self.candidates[pos]
+                
+                # Agrupar por conjunto de candidatos
+                pairs = defaultdict(list)
+                for key, cands in unit_candidates.items():
+                    pairs[frozenset(cands)].append(key)
+                
+                # Procesar parejas encontradas
+                for cand_set, indices in pairs.items():
+                    if len(indices) == 2:  # Pareja encontrada
+                        # Eliminar candidatos de otras celdas en la unidad
+                        for secondary_idx in range(9):
+                            if secondary_idx not in indices:
+                                if is_row:
+                                    pos = (primary_idx, secondary_idx)
+                                else:
+                                    pos = (secondary_idx, primary_idx)
+                                
+                                if pos in self.candidates:
+                                    before_len = len(self.candidates[pos])
+                                    self.candidates[pos] -= cand_set
+                                    if len(self.candidates[pos]) < before_len:
+                                        progress = True
         
-        # Verificar en columnas y cajas (código similar omitido por brevedad)
+        # Verificar en cajas 3x3
+        for box_row in range(0, 9, 3):
+            for box_col in range(0, 9, 3):
+                box_candidates = {}
+                for r in range(box_row, box_row + 3):
+                    for c in range(box_col, box_col + 3):
+                        if (r, c) in self.candidates and len(self.candidates[(r, c)]) == 2:
+                            box_candidates[(r, c)] = self.candidates[(r, c)]
+                
+                pairs = defaultdict(list)
+                for pos, cands in box_candidates.items():
+                    pairs[frozenset(cands)].append(pos)
+                
+                for cand_set, positions in pairs.items():
+                    if len(positions) == 2:  # Pareja encontrada
+                        # Eliminar estos candidatos de otras celdas en la caja
+                        for r in range(box_row, box_row + 3):
+                            for c in range(box_col, box_col + 3):
+                                if (r, c) in self.candidates and (r, c) not in positions:
+                                    before_len = len(self.candidates[(r, c)])
+                                    self.candidates[(r, c)] -= cand_set
+                                    if len(self.candidates[(r, c)]) < before_len:
+                                        progress = True
+        
         return progress
     
     def pointing_pairs(self):
-        """Técnica: Parejas apuntadas"""
+        """Técnica: Parejas apuntadas (candidatos en una caja que solo están en una fila/columna)"""
         progress = False
         
         for box_row in range(0, 9, 3):
             for box_col in range(0, 9, 3):
                 for num in range(1, 10):
+                    # Encontrar todas las posiciones en la caja donde puede ir este número
                     positions = []
                     for r in range(box_row, box_row + 3):
                         for c in range(box_col, box_col + 3):
@@ -147,6 +186,7 @@ class AdvancedSudokuSolver:
                         rows = set(pos[0] for pos in positions)
                         if len(rows) == 1:
                             row = list(rows)[0]
+                            # Eliminar este candidato de otras celdas en la fila (fuera de la caja)
                             for c in range(9):
                                 if (c < box_col or c >= box_col + 3) and (row, c) in self.candidates:
                                     if num in self.candidates[(row, c)]:
@@ -157,6 +197,7 @@ class AdvancedSudokuSolver:
                         cols = set(pos[1] for pos in positions)
                         if len(cols) == 1:
                             col = list(cols)[0]
+                            # Eliminar este candidato de otras celdas en la columna (fuera de la caja)
                             for r in range(9):
                                 if (r < box_row or r >= box_row + 3) and (r, col) in self.candidates:
                                     if num in self.candidates[(r, col)]:
@@ -189,19 +230,28 @@ class AdvancedSudokuSolver:
         """Resuelve usando técnicas lógicas avanzadas"""
         self.update_all_candidates()
         
+        iteration = 0
         while True:
+            iteration += 1
             progress = False
             
+            print(f"Iteración {iteration}")
+            
+            # Aplicar técnicas en orden de simplicidad
             if self.naked_singles():
+                print("  ✓ Números desnudos aplicados")
                 progress = True
             
             if self.hidden_singles():
+                print("  ✓ Números ocultos aplicados")
                 progress = True
             
             if self.naked_pairs():
+                print("  ✓ Parejas desnudas aplicadas")
                 progress = True
             
             if self.pointing_pairs():
+                print("  ✓ Parejas apuntadas aplicadas")
                 progress = True
             
             # Limpiar candidatos vacíos
@@ -210,9 +260,11 @@ class AdvancedSudokuSolver:
             if not progress:
                 break
             
+            # Verificar si está completo
             if len(self.candidates) == 0:
                 return True
         
+        print(f"Técnicas lógicas completadas en {iteration} iteraciones")
         return len(self.candidates) == 0
     
     def solve_with_backtrack(self):
@@ -250,165 +302,88 @@ class AdvancedSudokuSolver:
     
     def solve(self, grid):
         """Método principal de resolución"""
-        self.grid = np.array(grid, dtype=int)
+        self.grid = grid.copy()
         
+        print("Resolviendo con técnicas lógicas...")
         if self.solve_with_logic():
+            print("¡Resuelto completamente con lógica!")
             return True
         
+        print(f"Quedan {len(self.candidates)} celdas por resolver")
+        print("Aplicando backtracking inteligente...")
+        
         if self.solve_with_backtrack():
+            print("¡Resuelto con backtracking!")
             return True
         
         return False
-
-def checker(valor):
-    if valor == "":
-        return True
-    return valor == "" or (valor.isdigit() and 1 <= int(valor) <= 9)
-
-def resolver():
-    global sudokutemp
-    # Crear matriz del sudoku actual
-    sudoku = []
-    for fila in sudokutemp:
-        fila_valores = []
-        for entrada in fila:
-            valor = entrada.get()
-            if valor == "":
-                fila_valores.append(0)
-            else:
-                fila_valores.append(int(valor))
-        sudoku.append(fila_valores)
     
-    print("Sudoku a resolver:")
-    for fila in sudoku:
-        print(fila)
-    
-    # Crear el solucionador y resolver
-    solver = AdvancedSudokuSolver()
-    
-    try:
-        if solver.solve(sudoku):
-            # Actualizar la interfaz con la solución
-            solucion = solver.grid
-            for i in range(9):
-                for j in range(9):
-                    sudokutemp[i][j].delete(0, tk.END)
-                    sudokutemp[i][j].insert(0, str(solucion[i][j]))
+    def print_grid(self, grid=None):
+        """Imprime el sudoku de forma legible"""
+        if grid is None:
+            grid = self.grid
             
-            messagebox.showinfo("¡Éxito!", "¡Sudoku resuelto correctamente!")
-            print("Sudoku resuelto:")
-            for fila in solucion:
-                print(fila)
-        else:
-            messagebox.showerror("Error", "No se pudo resolver el sudoku. Verifica que sea válido.")
+        for i in range(9):
+            if i % 3 == 0 and i != 0:
+                print("- - - - - - - - - - - -")
+            
+            for j in range(9):
+                if j % 3 == 0 and j != 0:
+                    print(" | ", end="")
+                
+                if j == 8:
+                    print(grid[i][j])
+                else:
+                    print(str(grid[i][j]) + " ", end="")
     
-    except Exception as e:
-        messagebox.showerror("Error", f"Error al resolver: {str(e)}")
+    def print_candidates(self):
+        """Imprime los candidatos actuales"""
+        print("\nCandidatos restantes:")
+        for (row, col), cands in sorted(self.candidates.items()):
+            print(f"({row+1},{col+1}): {sorted(list(cands))}")
 
-def limpiar():
-    """Limpia todas las celdas del sudoku"""
-    global sudokutemp
-    for fila in sudokutemp:
-        for entrada in fila:
-            entrada.delete(0, tk.END)
-
-def cargar_ejemplo():
-    """Carga un sudoku de ejemplo"""
-    global sudokutemp
-    ejemplo = [
-        [0, 2, 0, 6, 0, 8, 0, 0, 0],
-        [5, 8, 0, 0, 0, 9, 7, 0, 0],
-        [0, 0, 0, 0, 4, 0, 0, 0, 0],
-        [3, 7, 0, 0, 0, 0, 5, 0, 0],
-        [6, 0, 0, 0, 0, 0, 0, 0, 4],
-        [0, 0, 8, 0, 0, 0, 0, 1, 3],
-        [0, 0, 0, 0, 2, 0, 0, 0, 0],
-        [0, 0, 9, 8, 0, 0, 0, 3, 6],
-        [0, 0, 0, 3, 0, 6, 0, 9, 0]
-    ]
-    
-    for i in range(9):
-        for j in range(9):
-            sudokutemp[i][j].delete(0, tk.END)
-            if ejemplo[i][j] != 0:
-                sudokutemp[i][j].insert(0, str(ejemplo[i][j]))
-
-def reiniciar():
-    ventana.destroy()
-    main()
 
 def main():
-    global ventana, sudokutemp
-    ventana = tk.Tk()
-    ventana.title("Sudokapp - Solucionador Avanzado")
-    ventana.geometry('700x550')
-    ventana.resizable(False, False)
+    # Sudoku muy difícil que requiere técnicas avanzadas
+    expert_puzzle = np.array([
+    [0, 2, 0, 6, 0, 8, 0, 0, 0],
+    [5, 8, 0, 0, 0, 9, 7, 0, 0],
+    [0, 0, 0, 0, 4, 0, 0, 0, 0],
+    [3, 7, 0, 0, 0, 0, 5, 0, 0],
+    [6, 0, 0, 0, 0, 0, 0, 0, 4],
+    [0, 0, 8, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 9, 8, 0, 0, 0, 3, 6],
+    [0, 0, 0, 3, 0, 6, 0, 9, 0]
+    ])
     
-    vf = ventana.register(checker)
+    """
+    [0, 0, 0, 0, 0, 6, 2, 0, 1],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 2, 0, 0, 7, 0, 5],
+    [3, 0, 0, 0, 1, 0, 0, 0, 6],
+    [4, 2, 0, 7, 0, 0, 0, 5, 0],
+    [0, 0, 0, 0, 0, 0, 0, 4, 0],
+    [0, 0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 5, 7, 0, 3, 0, 0, 9, 0],
+    [6, 0, 3, 5, 0, 9, 0, 0, 0]
+    """
     
-    # Título
-    titulo = tk.Label(ventana, text="Sudoku Solver", font=('Arial', 20, 'bold'))
-    titulo.pack(pady=10)
+    solver = AdvancedSudokuSolver()
     
-    # Frame para el tablero
-    tablero_frame = tk.Frame(ventana)
-    tablero_frame.pack(pady=10)
+    print("Sudoku original (nivel experto):")
+    solver.print_grid(expert_puzzle)
+    print("\n" + "="*40 + "\n")
     
-    sudokutemp = []
-    for row in range(9):
-        filasu = []
-        for col in range(9):
-            # Bordes para separar las cajas 3x3
-            if row % 3 == 0:
-                top_bor = 5
-            else:
-                top_bor = 1
-            if col % 3 == 0:
-                left_bor = 5
-            else:
-                left_bor = 1
-            
-            caja = tk.Entry(  
-                tablero_frame,
-                width=2,
-                relief="solid",
-                font=('Arial', 18),
-                validate="key",
-                bd=1,
-                validatecommand=(vf, "%P"),
-                justify='center'
-            )
-           
-            caja.grid(row=row, column=col, padx=(left_bor,0), pady=(top_bor, 0))
-            filasu.append(caja)
-           
-        sudokutemp.append(filasu)
-    
-    # Frame para los botones
-    botones_frame = tk.Frame(ventana)
-    botones_frame.pack(pady=20)
-    
-    boton_resolver = tk.Button(botones_frame, text="Resolver", bd=3, command=resolver, 
-                              font=('Arial', 12), bg='lightgreen', width=10)
-    boton_limpiar = tk.Button(botones_frame, text="Limpiar", bd=3, command=limpiar, 
-                             font=('Arial', 12), bg='lightblue', width=10)
-    boton_ejemplo = tk.Button(botones_frame, text="Ejemplo", bd=3, command=cargar_ejemplo, 
-                             font=('Arial', 12), bg='lightyellow', width=10)
-    boton_reiniciar = tk.Button(botones_frame, text="Reiniciar", bd=3, command=reiniciar, 
-                               font=('Arial', 12), bg='lightcoral', width=10)
-    
-    # Organizar botones en una fila
-    boton_resolver.grid(row=0, column=0, padx=5)
-    boton_limpiar.grid(row=0, column=1, padx=5)
-    boton_ejemplo.grid(row=0, column=2, padx=5)
-    boton_reiniciar.grid(row=0, column=3, padx=5)
-    
-    # Instrucciones
-    instrucciones = tk.Label(ventana, text="Ingresa los números del 1-9. Deja vacías las celdas desconocidas.", 
-                            font=('Arial', 10))
-    instrucciones.pack(pady=5)
-    
-    ventana.mainloop()
+    if solver.solve(expert_puzzle):
+        print("\nSudoku resuelto:")
+        solver.print_grid()
+    else:
+        print("No se pudo resolver el sudoku")
+        solver.print_candidates()
+        
+    print(solver.grid)
+    print(solver.candidates)
 
 if __name__ == "__main__":
     main()

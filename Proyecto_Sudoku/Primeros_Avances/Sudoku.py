@@ -344,3 +344,49 @@ class AdvancedSudokuSolver:
         print("\nCandidatos restantes:")
         for (row, col), cands in sorted(self.candidates.items()):
             print(f"({row+1},{col+1}): {sorted(list(cands))}")
+
+
+def main():
+    # Sudoku muy difícil que requiere técnicas avanzadas
+    expert_puzzle = np.array([
+    [0, 2, 0, 6, 0, 8, 0, 0, 0],
+    [5, 8, 0, 0, 0, 9, 7, 0, 0],
+    [0, 0, 0, 0, 4, 0, 0, 0, 0],
+    [3, 7, 0, 0, 0, 0, 5, 0, 0],
+    [6, 0, 0, 0, 0, 0, 0, 0, 4],
+    [0, 0, 8, 0, 0, 0, 0, 1, 3],
+    [0, 0, 0, 0, 2, 0, 0, 0, 0],
+    [0, 0, 9, 8, 0, 0, 0, 3, 6],
+    [0, 0, 0, 3, 0, 6, 0, 9, 0]
+    ])
+    
+    """
+    [0, 0, 0, 0, 0, 6, 2, 0, 1],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 2, 0, 0, 7, 0, 5],
+    [3, 0, 0, 0, 1, 0, 0, 0, 6],
+    [4, 2, 0, 7, 0, 0, 0, 5, 0],
+    [0, 0, 0, 0, 0, 0, 0, 4, 0],
+    [0, 0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 5, 7, 0, 3, 0, 0, 9, 0],
+    [6, 0, 3, 5, 0, 9, 0, 0, 0]
+    """
+    
+    solver = AdvancedSudokuSolver()
+    
+    print("Sudoku original (nivel experto):")
+    solver.print_grid(expert_puzzle)
+    print("\n" + "="*40 + "\n")
+    
+    if solver.solve(expert_puzzle):
+        print("\nSudoku resuelto:")
+        solver.print_grid()
+    else:
+        print("No se pudo resolver el sudoku")
+        solver.print_candidates()
+        
+    print(solver.grid)
+    print(solver.candidates)
+
+if __name__ == "__main__":
+    main()
