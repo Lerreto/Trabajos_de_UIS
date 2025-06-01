@@ -13,6 +13,8 @@ class AdvancedSudokuSolver:
         self.box_size = 3
         self.grid = None # Almacena la matriz resuelta
         self.candidates = None # Muestra los candidatos posibles
+        self.clues = None # Almacena las pistas para determinar dificultad
+        self.difficulty = None # La dificultad se define
     
     
     """ <----- HALLANDO CANDIDATOS PARA EL TRABAJO -----> """
@@ -44,10 +46,30 @@ class AdvancedSudokuSolver:
     def update_all_candidates(self):
         """Actualiza la matriz de candidatos para todas las celdas"""
         self.candidates = {}
+        self.clues = 0
         for i in range(9):
             for j in range(9):
                 if self.grid[i, j] == 0:
                     self.candidates[(i, j)] = self.get_candidates(i, j)
+                else:
+                    self.clues += 1
+                    
+        if 40 <= self.clues <= 81:
+            self.difficulty = "Muy facil"
+        elif 35 <= self.clues <= 39:
+            self.difficulty  = "Facil"
+        elif 30 <= self.clues <= 34:
+            self.difficulty  = "Intermedio"
+        elif 25 <= self.clues <= 29:
+            self.difficulty  = "Dificil"
+        elif 22 <= self.clues <= 24:
+            self.difficulty  = "Experto"
+        elif 17 <= self.clues <= 21:
+            self.difficulty  = "Inhumano"
+        elif 0 <= self.clues <= 16:
+            self.difficulty  = "Hacker"
+            
+        print(self.difficulty)
     
     
     """ <----- FUNCIONES LOGICAS (TECNICAS SUDOKUS) -----> """
@@ -383,69 +405,14 @@ class AdvancedSudokuSolver:
         print("\nCandidatos restantes:")
         for (row, col), cands in sorted(self.candidates.items()):
             print(f"({row+1},{col+1}): {sorted(list(cands))}")
+            
 
-
-"""def main():
-    # Sudoku muy difícil que requiere técnicas avanzadas
-    expert_puzzle = np.array([
-    [0, 2, 0, 6, 0, 8, 0, 0, 0],
-    [5, 8, 0, 0, 0, 9, 7, 0, 0],
-    [0, 0, 0, 0, 4, 0, 0, 0, 0],
-    [3, 7, 0, 0, 0, 0, 5, 0, 0],
-    [6, 0, 0, 0, 0, 0, 0, 0, 4],
-    [0, 0, 8, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 9, 8, 0, 0, 0, 3, 6],
-    [0, 0, 0, 3, 0, 6, 0, 9, 0]
-    ])
-
-    
-    solver = AdvancedSudokuSolver()
-    
-    print("Sudoku original (nivel experto):")
-    solver.print_grid(expert_puzzle)
-    print("\n" + "="*40 + "\n")
-    
-    if solver.solve(expert_puzzle):
-        print("\nSudoku resuelto:")
-        solver.print_grid()
-    else:
-        print("No se pudo resolver el sudoku")
-        solver.print_candidates()
-        
-    print(solver.grid)
-    print(solver.candidates)"""
-
-
-expert_puzzle = np.array([
-    [0, 2, 0, 6, 0, 8, 0, 0, 0],
-    [5, 8, 0, 0, 0, 9, 7, 0, 0],
-    [0, 0, 0, 0, 4, 0, 0, 0, 0],
-    [3, 7, 0, 0, 0, 0, 5, 0, 0],
-    [6, 0, 0, 0, 0, 0, 0, 0, 4],
-    [0, 0, 8, 0, 0, 0, 0, 1, 3],
-    [0, 0, 0, 0, 2, 0, 0, 0, 0],
-    [0, 0, 9, 8, 0, 0, 0, 3, 6],
-    [0, 0, 0, 3, 0, 6, 0, 9, 0]
-    ])
-
-expert_puzzle_2 = np.array([
-    [0, 0, 0, 0, 0, 6, 2, 0, 1],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 2, 0, 0, 7, 0, 5],
-    [3, 0, 0, 0, 1, 0, 0, 0, 6],
-    [4, 2, 0, 7, 0, 0, 0, 5, 0],
-    [0, 0, 0, 0, 0, 0, 0, 4, 0],
-    [0, 0, 0, 0, 0, 2, 0, 0, 0],
-    [0, 5, 7, 0, 3, 0, 0, 9, 0],
-    [6, 0, 3, 5, 0, 9, 0, 0, 0]
-    ])
-
+# Funcion que devuelve lo que es el sudoku resuelto y la dificultad
 def Resolver(Sudoku_Sin_Resolver):
     
     solver = AdvancedSudokuSolver()
     
-    print("Sudoku original (nivel experto):")
+    print(f"Sudoku original:")
     solver.print_grid(Sudoku_Sin_Resolver)
     print("\n" + "="*40 + "\n")
     
@@ -455,9 +422,37 @@ def Resolver(Sudoku_Sin_Resolver):
     else:
         print("No se pudo resolver el sudoku")
         solver.print_candidates()
+        
+    print(f"\nDIFICULTAD: {solver.difficulty}\n")
     
-    return solver.grid
+    return solver.grid, solver.difficulty
 
-Resuelta = Resolver(expert_puzzle)
 
-    
+
+if __name__ == "__main__":
+    expert_puzzle = np.array([
+        [0, 2, 0, 6, 0, 8, 0, 0, 0],
+        [5, 8, 0, 0, 0, 9, 7, 0, 0],
+        [0, 0, 0, 0, 4, 0, 0, 0, 0],
+        [3, 7, 0, 0, 0, 0, 5, 0, 0],
+        [6, 0, 0, 0, 0, 0, 0, 0, 4],
+        [0, 0, 8, 0, 0, 0, 0, 1, 3],
+        [0, 0, 0, 0, 2, 0, 0, 0, 0],
+        [0, 0, 9, 8, 0, 0, 0, 3, 6],
+        [0, 0, 0, 3, 0, 6, 0, 9, 0]
+        ])
+
+    expert_puzzle_2 = np.array([
+        [0, 0, 0, 0, 0, 6, 2, 0, 1],
+        [8, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 2, 0, 0, 7, 0, 5],
+        [3, 0, 0, 0, 1, 0, 0, 0, 6],
+        [4, 2, 0, 7, 0, 0, 0, 5, 0],
+        [0, 0, 0, 0, 0, 0, 0, 4, 0],
+        [0, 0, 0, 0, 0, 2, 0, 0, 0],
+        [0, 5, 7, 0, 3, 0, 0, 9, 0],
+        [6, 0, 3, 5, 0, 9, 0, 0, 0]
+        ])
+
+    Resuelta, dificultad = Resolver(expert_puzzle)
+    print(dificultad)
