@@ -2,12 +2,23 @@ import numpy as np
 from collections import defaultdict
 
 class AdvancedSudokuSolver:
+    
+    
+    """ <----- PARAMETROS INICIALES -----> """
+    
+    
     def __init__(self):
+        # Esto lo puse de medio decorativo, esq parecia vacido con 2 JAJAJAJAJA
         self.size = 9
         self.box_size = 3
-        self.grid = None
-        self.candidates = None
+        self.grid = None # Almacena la matriz resuelta
+        self.candidates = None # Muestra los candidatos posibles
     
+    
+    """ <----- HALLANDO CANDIDATOS PARA EL TRABAJO -----> """
+     
+     
+    # En el apartado Grid va a comenzar a guardar todos los candidatos en formato diccionario, de tal manera pueda llamarlos de clave --> valor, pero solo de una casilla
     def get_candidates(self, row, col):
         """Obtiene los candidatos posibles para una celda"""
         if self.grid[row, col] != 0:
@@ -29,6 +40,7 @@ class AdvancedSudokuSolver:
         
         return set(range(1, 10)) - used_numbers
     
+    # Recorre todas las casillas del sudoku para llamar luego a la funcion de get_candidates y hallar los candidatos correspondientes
     def update_all_candidates(self):
         """Actualiza la matriz de candidatos para todas las celdas"""
         self.candidates = {}
@@ -37,10 +49,17 @@ class AdvancedSudokuSolver:
                 if self.grid[i, j] == 0:
                     self.candidates[(i, j)] = self.get_candidates(i, j)
     
+    
+    """ <----- FUNCIONES LOGICAS (TECNICAS SUDOKUS) -----> """
+    
+    
+    # Al recorrer cada casilla si solo tiene un numero de candidato, se establece como dentro de la matriz original
     def naked_singles(self):
         """Técnica: Números desnudos (celdas con un solo candidato)"""
         progress = False
+        # Solo hara esta verificacion en la lista de candidatos de los items
         for (row, col), cands in list(self.candidates.items()):
+            # Si ve que solamente es uno, lo establece en la matriz grip
             if len(cands) == 1:
                 num = list(cands)[0]
                 self.grid[row, col] = num
@@ -53,7 +72,7 @@ class AdvancedSudokuSolver:
         """Técnica: Números ocultos (único lugar posible en fila/columna/caja)"""
         progress = False
         
-        # Verificar filas
+        # Verificar filas y columnas a la vez
         for primary_idx in range(9):
             for num in range(1, 10):
                 possible_cols = []
@@ -64,20 +83,23 @@ class AdvancedSudokuSolver:
                     if (secondary_idx, primary_idx) in self.candidates and num in self.candidates[(secondary_idx, primary_idx)]:
                         possible_rows.append(secondary_idx)
                 
-                if len(possible_cols) == 1:
-                    secondary_idx = possible_cols[0]
-                    self.grid[primary_idx, secondary_idx] = num
-                    del self.candidates[(primary_idx, secondary_idx)]
-                    self.update_candidates_after_placement(primary_idx, secondary_idx, num)
-                    
                 if len(possible_rows) == 1:
                     secondary_idx = possible_rows[0]
-                    self.grid[primary_idx, secondary_idx] = num
-                    del self.candidates[(secondary_idx, primary_idx)]
-                    self.update_candidates_after_placement(secondary_idx, primary_idx, num)
-                
-                if len(possible_cols) == 1 or len(possible_rows) == 1:
-                    progress = True
+                    key = (secondary_idx, primary_idx)
+                    if key in self.candidates:
+                        self.grid[secondary_idx, primary_idx] = num
+                        del self.candidates[key]
+                        self.update_candidates_after_placement(secondary_idx, primary_idx, num)
+                        progress = True
+
+                if len(possible_cols) == 1:
+                    secondary_idx = possible_cols[0]
+                    key = (primary_idx, secondary_idx)
+                    if key in self.candidates:
+                        self.grid[primary_idx, secondary_idx] = num
+                        del self.candidates[key]
+                        self.update_candidates_after_placement(primary_idx, secondary_idx, num)
+                        progress = True
         
         # Verificar cajas 3x3
         for box_row in range(0, 9, 3):
@@ -206,6 +228,10 @@ class AdvancedSudokuSolver:
         
         return progress
     
+    
+    """ <----- ACTUALIZACION DESPUES DE CADA PROCESO LOGICO -----> """
+    
+    
     def update_candidates_after_placement(self, row, col, num):
         """Actualiza candidatos después de colocar un número"""
         # Eliminar de la fila
@@ -225,6 +251,10 @@ class AdvancedSudokuSolver:
             for c in range(box_col, box_col + 3):
                 if (r, c) in self.candidates:
                     self.candidates[(r, c)].discard(num)
+    
+    
+    """ <----- SOLUCIOND DE SUDOKU POR METODOS LOGICOS -----> """
+    
     
     def solve_with_logic(self):
         """Resuelve usando técnicas lógicas avanzadas"""
@@ -267,6 +297,10 @@ class AdvancedSudokuSolver:
         print(f"Técnicas lógicas completadas en {iteration} iteraciones")
         return len(self.candidates) == 0
     
+    
+    """ <----- BACKTRACKING -----> """
+    
+    
     def solve_with_backtrack(self):
         """Backtracking para casos no resueltos por lógica"""
         if len(self.candidates) == 0:
@@ -300,6 +334,10 @@ class AdvancedSudokuSolver:
         
         return False
     
+    
+    """ <----- EJECUCION DEL PROGRAMA POR AMBAS TECNICAS -----> """
+    
+    
     def solve(self, grid):
         """Método principal de resolución"""
         self.grid = grid.copy()
@@ -317,6 +355,10 @@ class AdvancedSudokuSolver:
             return True
         
         return False
+    
+    
+    """ <----- IMPRESION DE MATRIZ EN TERMINAL -----> """
+    
     
     def print_grid(self, grid=None):
         """Imprime el sudoku de forma legible"""
@@ -398,6 +440,18 @@ expert_puzzle = np.array([
     [0, 0, 0, 3, 0, 6, 0, 9, 0]
     ])
 
+expert_puzzle_2 = np.array([
+    [0, 0, 0, 0, 0, 6, 2, 0, 1],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 2, 0, 0, 7, 0, 5],
+    [3, 0, 0, 0, 1, 0, 0, 0, 6],
+    [4, 2, 0, 7, 0, 0, 0, 5, 0],
+    [0, 0, 0, 0, 0, 0, 0, 4, 0],
+    [0, 0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 5, 7, 0, 3, 0, 0, 9, 0],
+    [6, 0, 3, 5, 0, 9, 0, 0, 0]
+    ])
+
 def Resolver(Sudoku_Sin_Resolver):
     
     solver = AdvancedSudokuSolver()
@@ -417,4 +471,8 @@ def Resolver(Sudoku_Sin_Resolver):
 
 Resuelta = Resolver(expert_puzzle)
 print(Resuelta)
+
+Resuelta = Resolver(expert_puzzle_2)
+print(Resuelta)
+
     
