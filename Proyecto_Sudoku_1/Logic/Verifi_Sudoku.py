@@ -17,7 +17,7 @@ expert_puzzle = np.array([
 '''Función que rectificará si hay algún elemento repetido en una fila, columna o 
    cuadrado (Llamando a la respectiva función en el último caso)'''
    
-def rectificar(matriz):
+def verificacion(matriz):
     cuad = rectsqr(matriz)
    
     
@@ -68,13 +68,13 @@ def rectsqr(matriz):
     return True
 
 
+if __name__ == "__main__":
+    estado = verificacion(expert_puzzle)
 
-estado = rectificar(expert_puzzle)
+    #Si alguna de las condiciones devuelve el resultado "False", se asume que hay algún elemento repetido
+    if estado == False:
+        print("El Sudoku tiene elementos repetidos en alguna fila, columna o cuadrado")
 
-#Si alguna de las condiciones devuelve el resultado "False", se asume que hay algún elemento repetido
-if estado == False:
-    print("El Sudoku tiene elementos repetidos en alguna fila, columna o cuadrado")
-
-#Al contrario, entonces se asume que el sudoku está bien estructurado    
-else:
-    print("El Sudoku no tiene elementos repetidos que Infrinja las reglas")
+    #Al contrario, entonces se asume que el sudoku está bien estructurado    
+    else:
+        print("El Sudoku no tiene elementos repetidos que Infrinja las reglas")

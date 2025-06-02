@@ -59,13 +59,13 @@ def quitar_casillas(tablero):
         sudoku[fila][col] = 0
 
     print(f"Nivel del sudoku: {nivel}")  # Muestra el nivel seleccionado
-    return sudoku  # Devuelve el Sudoku con espacios en blanco para jugar
+    return sudoku, nivel  # Devuelve el Sudoku con espacios en blanco para jugar
 
 # Función que genera un Sudoku jugable, con solución incluida
 def generar_sudoku_jugable():
     solucion = generar_sudoku_base()           # Genera un tablero completo
-    sudoku_con_espacios = quitar_casillas(solucion)  # Le quita casillas según la dificultad
-    return sudoku_con_espacios  # Devuelve el tablero listo para jugar
+    sudoku_con_espacios, nivel = quitar_casillas(solucion)  # Le quita casillas según la dificultad
+    return sudoku_con_espacios, nivel  # Devuelve el tablero listo para jugar
 
 # Ejemplo de uso
 if __name__ == "__main__":
