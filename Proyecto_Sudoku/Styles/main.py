@@ -223,7 +223,7 @@ class SudokuSolverApp:
                                        width=12,
                                        justify='center',
                                        bg='#505050',
-                                       fg='#00ff88',
+                                       fg="#050505",
                                        state='readonly',
                                        bd=2,
                                        relief='solid',
