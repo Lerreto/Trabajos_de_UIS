@@ -43,8 +43,10 @@ class AdvancedSudokuSolver:
         box_row = (row // 3) * 3
         box_col = (col // 3) * 3
         used_numbers.update(self.grid[box_row:box_row+3, box_col:box_col+3].flatten())
-        
+
         return set(range(1, 10)) - used_numbers
+    
+        
     
     # Recorre todas las casillas del sudoku para llamar luego a la funcion de get_candidates y hallar los candidatos correspondientes
     def update_all_candidates(self):
@@ -109,6 +111,7 @@ class AdvancedSudokuSolver:
                     if (secondary_idx, primary_idx) in self.candidates and num in self.candidates[(secondary_idx, primary_idx)]:
                         possible_rows.append(secondary_idx)
                 
+                # Para la parte de las filas se utiliza esta validacion
                 if len(possible_rows) == 1:
                     secondary_idx = possible_rows[0]
                     key = (secondary_idx, primary_idx)
@@ -117,7 +120,8 @@ class AdvancedSudokuSolver:
                         del self.candidates[key]
                         self.update_candidates_after_placement(secondary_idx, primary_idx, num)
                         progress = True
-
+                
+                # Apartado de las columnas
                 if len(possible_cols) == 1:
                     secondary_idx = possible_cols[0]
                     key = (primary_idx, secondary_idx)
@@ -171,6 +175,13 @@ class AdvancedSudokuSolver:
                 pairs = defaultdict(list)
                 for key, cands in unit_candidates.items():
                     pairs[frozenset(cands)].append(key)
+                
+                """
+                pairs = {
+                    frozenset({2, 8}): [(4, 3), (4, 7)],  # <- par desnudo
+                    frozenset({3}): [(4, 2)],
+                }
+                """
                 
                 # Procesar parejas encontradas
                 for cand_set, indices in pairs.items():

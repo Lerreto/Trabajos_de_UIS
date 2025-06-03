@@ -71,9 +71,7 @@ class SudokuSolverApp:
                   background=[('active', '#00ff44'),  # Verde al hacer hover
                             ('pressed', '#00cc33')],
                   foreground=[('active', 'black'),    # Texto negro en hover
-                            ('pressed', 'black')],
-                  relief=[('pressed', 'flat'),
-                         ('!pressed', 'flat')])
+                            ('pressed', 'black')])
         
         # Estilo para labels - más grandes
         style.configure('Modern.TLabel',
@@ -287,7 +285,7 @@ class SudokuSolverApp:
                     self.error_mostrado = True  # Marcar que ya se mostró error
                     # Usar after para evitar bloqueo
                     self.root.after(100, lambda: self.mostrar_error_verificacion())
-            
+            #Modern Tbutton
             self.verificando = False
             
         except Exception as e:
