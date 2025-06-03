@@ -4,11 +4,11 @@ import numpy as np
 import sys
 import os
 
-# Agrega la carpeta raíz del proyecto al path
+# De esta manera me busca el archivo correspondiente
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # ============================================================================
-# AQUÍ DEBES IMPORTAR TUS MÓDULOS REALES:
+# IMPORTACION DE ARCHIVOS PARA EL USO
 # ============================================================================
 
 from Logic.Generate_Sudoku import generar_sudoku_jugable
@@ -90,7 +90,7 @@ class SudokuSolverApp:
         # Título principal más grande
         title_label = tk.Label(main_frame, 
                               text="🧩 Solucionario de Sudokus",
-                              font=('Arial', 28, 'bold'),  # Mucho más grande
+                              font=('Arial', 28, 'bold'),  # Mucho más grande creeria
                               bg='#1e1e1e',
                               fg='#00ff88')
         title_label.pack(pady=(0, 30))
@@ -394,6 +394,7 @@ class SudokuSolverApp:
 # ============================================================================
 # FUNCIÓN PRINCIPAL
 # ============================================================================
+
 def main():
     root = tk.Tk()
     app = SudokuSolverApp(root)

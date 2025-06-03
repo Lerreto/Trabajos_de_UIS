@@ -1,6 +1,10 @@
 import numpy as np
 from collections import defaultdict
 
+# ============================================================================
+# CLASE PRINCIPAL DE LA APLICACIÓN
+# ============================================================================
+
 class AdvancedSudokuSolver:
     
     
