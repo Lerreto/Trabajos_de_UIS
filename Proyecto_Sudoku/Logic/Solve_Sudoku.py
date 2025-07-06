@@ -20,6 +20,7 @@ class AdvancedSudokuSolver:
         self.clues = None # Almacena las pistas para determinar dificultad
         self.difficulty = None # La dificultad se define
     
+    # Hola que tal
     
     """ <----- HALLANDO CANDIDATOS PARA EL TRABAJO -----> """
      
